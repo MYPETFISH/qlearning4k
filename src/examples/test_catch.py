@@ -17,5 +17,13 @@ model.compile(sgd(lr=.2), "mse")
 
 catch = Catch(grid_size)
 agent = Agent(model=model)
-agent.train(catch, batch_size=10, nb_epoch=1000, epsilon=.1)
+agent.train(catch, batch_size=10, nb_epoch=500, epsilon=.1)
 agent.play(catch)
+
+# serialize model to JSON
+model_json = model.to_json()
+with open('C:/temp/py/fariz/catch' + '.json', 'w') as json_file:
+    json_file.write(model_json)
+
+# serialize weights to HDF5
+model.save_weights('C:/temp/py/fariz/catch' + '.h5')
