@@ -29,7 +29,7 @@ class Game(object):
 	def is_won(self):
 		return False
 
-	def get_frame(self):
+	def get_frame(self):	# returns scaled
 		return self.get_state()
 
 	def draw(self):

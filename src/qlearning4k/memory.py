@@ -13,7 +13,10 @@ class Memory:
     def get_batch(self, model, batch_size):
         pass
 
+'''
+    NEEDS CHANGING ?
 
+'''
 class ExperienceReplay(Memory):
 
     def __init__(self, memory_size=100, fast=None):
@@ -35,24 +38,37 @@ class ExperienceReplay(Memory):
             return self.get_batch_fast(model, batch_size, gamma)
         if len(self.memory) < batch_size:
             batch_size = len(self.memory)
+        
         nb_actions = model.output_shape[-1]
+        
         samples = np.array(sample(self.memory, batch_size))
         input_dim = np.prod(self.input_shape)
+       
         S = samples[:, 0 : input_dim]
         a = samples[:, input_dim]
         r = samples[:, input_dim + 1]
+        
         S_prime = samples[:, input_dim + 2 : 2 * input_dim + 2]
+        
         game_over = samples[:, 2 * input_dim + 2]
+        
         r = r.repeat(nb_actions).reshape((batch_size, nb_actions))
+        
         game_over = game_over.repeat(nb_actions).reshape((batch_size, nb_actions))
+        
         S = S.reshape((batch_size, ) + self.input_shape)
+
         S_prime = S_prime.reshape((batch_size, ) + self.input_shape)
         X = np.concatenate([S, S_prime], axis=0)
         Y = model.predict(X)
+        
         Qsa = np.max(Y[batch_size:], axis=1).repeat(nb_actions).reshape((batch_size, nb_actions))
         delta = np.zeros((batch_size, nb_actions))
+        
         a = np.cast['int'](a)
+        
         delta[np.arange(batch_size), a] = 1
+        
         targets = (1 - delta) * Y[:batch_size] + delta * (r + gamma * (1 - game_over) * Qsa)
         return S, targets
 

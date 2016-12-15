@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 import matplotlib.image as img
 import os
 
+'''
+	Change this file as little as possible
+	push implementation details to the game
+	state is an abstract concept in this class
+	frame is a view of the state?
+'''
 class Agent:
 
-	def __init__(self, model, memory=None, memory_size=1000, nb_frames=None):
+	def __init__(self, model, memory=None, memory_size=200, nb_frames=None):
 		assert len(model.output_shape) == 2, "Model's output shape should be (nb_samples, nb_actions)."
 		if memory:
 			self.memory = memory
@@ -19,7 +25,7 @@ class Agent:
 		elif model.input_shape[1] and nb_frames and model.input_shape[1] != nb_frames:
 			raise Exception("Dimension mismatch : time dimension of model should be equal to nb_frames.")
 		self.model = model
-		self.nb_frames = nb_frames
+		self.nb_frames = nb_frames	# model input shape, 24
 		self.frames = None
 
 	@property
@@ -35,6 +41,7 @@ class Agent:
 
 	def check_game_compatibility(self, game):
 		game_output_shape = (1, None) + game.get_frame().shape
+		#game_output_shape = (None, game.get_frame().shape)
 		if len(game_output_shape) != len(self.model.input_shape):
 			raise Exception('Dimension mismatch. Input shape of the model should be compatible with the game.')
 		else:
@@ -44,8 +51,8 @@ class Agent:
 		if len(self.model.output_shape) != 2 or self.model.output_shape[1] != game.nb_actions:
 			raise Exception('Output shape of model should be (nb_samples, nb_actions).')
 
-	def get_game_data(self, game):
-		frame = game.get_frame()
+	def get_game_data(self, game):	# returns scaled
+		frame = game.get_frame()	# candidate to return scaled
 		if self.frames is None:
 			self.frames = [frame] * self.nb_frames
 		else:
@@ -74,24 +81,27 @@ class Agent:
 			if reset_memory:
 				self.reset_memory()
 			game_over = False
-			S = self.get_game_data(game)
+			S = self.get_game_data(game) # S must be scaled
 			while not game_over:
 				if np.random.random() < epsilon or epoch < observe:
 					a = int(np.random.randint(game.nb_actions))
 				else:
-					q = model.predict(S)
+					# S must be scaled
+					q = model.predict(S)		# !
 					a = int(np.argmax(q[0]))
 				game.play(a)
 				r = game.get_score()
-				S_prime = self.get_game_data(game)
+				S_prime = self.get_game_data(game) # S_prime must be scaled
 				game_over = game.is_over()
-				transition = [S, a, r, S_prime, game_over]
+				# S, a, S_prime, must be scaled
+				# reward, game over is not scaled in catch/snake
+				transition = [S, a, r, S_prime, game_over] # !
 				self.memory.remember(*transition)
 				S = S_prime
 				if epoch >= observe:
 					batch = self.memory.get_batch(model=model, batch_size=batch_size, gamma=gamma)
 					if batch:
-						inputs, targets = batch
+						inputs, targets = batch	# scaled
 						loss += float(model.train_on_batch(inputs, targets))
 				if checkpoint and ((epoch + 1 - observe) % checkpoint == 0 or epoch + 1 == nb_epoch):
 					model.save_weights('weights.dat')
@@ -109,7 +119,7 @@ class Agent:
 		for epoch in range(nb_epoch):
 			game.reset()
 			self.clear_frames()
-			S = self.get_game_data(game)
+			S = self.get_game_data(game)	# S must be scaled
 			if visualize:
 				frames.append(game.draw())
 			game_over = False
@@ -118,7 +128,8 @@ class Agent:
 					print("random")
 					action = int(np.random.randint(0, game.nb_actions))
 				else:
-					q = model.predict(S)[0]
+					# S must be scaled
+					q = model.predict(S)[0]		# !
 					possible_actions = game.get_possible_actions()
 					q = [q[i] for i in possible_actions]
 					action = possible_actions[np.argmax(q)]
