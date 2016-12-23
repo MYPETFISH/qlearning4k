@@ -16,7 +16,7 @@ class Config(object):
     policy_funds = 1    # 1=100% funds used per order
     policy_stocks = 1   # 1=100% units sold per order
 
-    lr=0.001
+    lr=0.1
     horizon=2
     batch_size=75
     epoch = 1500

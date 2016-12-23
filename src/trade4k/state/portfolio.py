@@ -39,6 +39,7 @@ class Portfolio(object):
         
         self.lastClose = self.origin[0][Feed.closeIdx]  # initial close
         self.price(self.lastClose)
+        self.last_close_delta = 0
         
  
     def price_delta(self, closeDelta):       # replaces valuation
@@ -67,13 +68,19 @@ class Portfolio(object):
         val =  (self.units * self.lastClose) + self.funds 
         return val/bm
 
+    def wealth(self):
+        bm = (self.units_bm * self.lastClose) + self.funds_bm
+        val =  (self.units * self.lastClose) + self.funds 
+        return val-bm
+
     def update(self, order):
         self.funds -= order*self.lastClose
         self.units += order
+        pass
 
     # returns S_portfolio, unscaled
     def getState(self):
-        return np.array([self.units, self.funds, self.cValue]).reshape(1,3)
+        return np.array([self.units, self.funds, self.cValue], dtype='f').reshape(1,3)
 
     def getValues(self):
         return self.pValue, self.cValue
@@ -81,6 +88,10 @@ class Portfolio(object):
     def getVals(self):
         vals = [self.units, self.funds, self.pValue]        
         return vals
+    
+    # q-learning manages discounted future reward
+    def getProfit(self):
+        return self.cValue - self.pValue
 
     def getScaledVals(self):
         xg = np.array([self.units, self.funds, self.pValue]).reshape(-1,1)
@@ -89,6 +100,9 @@ class Portfolio(object):
 
     def unscaleVales(self, vals):
         return self.scale.inverse_transform(vals)
+    
+    # helpers
+    
     '''
     def inverse(self, X):
         X = np.array(X).reshape((1, -1))
@@ -103,10 +117,7 @@ class Portfolio(object):
     # units funds pval
     def inverse(self, X):
         return self.scaler.inverse_transform(X)
-    
-    # q-learning manages discounted future reward
-    def getProfit(self):
-        return self.cValue - self.pValue
+
 
     # HELPER
     def actionStr(self, action):

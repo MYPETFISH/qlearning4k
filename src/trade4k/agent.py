@@ -1,8 +1,13 @@
-from .memory import ExperienceReplay
+from memory import ExperienceReplay
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 import os
+import csv
+import math
+
+from trade4k.state.config import Config
+from trade4k.util.save import Save
 
 '''
 	Change this file as little as possible
@@ -71,26 +76,31 @@ class Agent:
 			epsilon = epsilon[0]
 		else:
 			final_epsilon = epsilon
+		save = Save()
 		model = self.model
 		nb_actions = model.output_shape[-1]
 		win_count = 0
 		for epoch in range(nb_epoch):
 			loss = 0.
+			q = np.zeros(3)
 			game.reset()
 			self.clear_frames()
 			if reset_memory:
 				self.reset_memory()
 			game_over = False
 			S = self.get_game_data(game) # S must be scaled
+			i=0
 			while not game_over:
+				i=i+1
 				if np.random.random() < epsilon or epoch < observe:
 					a = int(np.random.randint(game.nb_actions))
+					print ('>'),
 				else:
 					# S must be scaled
 					q = model.predict(S)		# !
 					a = int(np.argmax(q[0]))
 				game.play(a)
-				r = game.get_score()
+				r = game.get_score(a)
 				S_prime = self.get_game_data(game) # S_prime must be scaled
 				game_over = game.is_over()
 				# S, a, S_prime, must be scaled
@@ -103,19 +113,27 @@ class Agent:
 					if batch:
 						inputs, targets = batch	# scaled
 						loss += float(model.train_on_batch(inputs, targets))
-				if checkpoint and ((epoch + 1 - observe) % checkpoint == 0 or epoch + 1 == nb_epoch):
-					model.save_weights('weights.dat')
+				#if checkpoint and ((epoch + 1 - observe) % checkpoint == 0 or epoch + 1 == nb_epoch):
+					#model.save_weights('4kweights.dat')
+
+				save.log(game, epoch)				
+					
 			if game.is_won():
 				win_count += 1
 			if epsilon > final_epsilon and epoch >= observe:
 				epsilon -= delta
-			print("Epoch {:03d}/{:03d} | Loss {:.4f} | Epsilon {:.2f} | Win count {}".format(epoch + 1, nb_epoch, loss, epsilon, win_count))
+			print("Epoch {:03d}/{:03d} | Loss {:.4f} | Epsilon {:.2f} | Win count {} | loss Avg {:.4f}".format(epoch + 1, nb_epoch, loss, epsilon, win_count, loss/i))
+
+			if ((epoch % 10)==0):
+				save.save_model(model, '4kmodel')
+			save.log_epoch(loss, win_count, loss/i)		
 
 	def play(self, game, nb_epoch=10, epsilon=0., visualize=True):
 		self.check_game_compatibility(game)
 		model = self.model
 		win_count = 0
 		frames = []
+		save = Save()
 		for epoch in range(nb_epoch):
 			game.reset()
 			self.clear_frames()
@@ -133,18 +151,25 @@ class Agent:
 					possible_actions = game.get_possible_actions()
 					q = [q[i] for i in possible_actions]
 					action = possible_actions[np.argmax(q)]
+					
 				game.play(action)
+				
 				S = self.get_game_data(game)
+				'''
 				if visualize:
 					frames.append(game.draw())
 				game_over = game.is_over()
+				'''
+				save.log(game, nb_epoch)				
+
 			if game.is_won():
 				win_count += 1
 		print("Accuracy {} %".format(100. * win_count / nb_epoch))
+		'''
 		if visualize:
 			if 'images' not in os.listdir('.'):
 				os.mkdir('images')
 			for i in range(len(frames)):
 				plt.imshow(frames[i], interpolation='none')
 				plt.savefig("images/" + game.name + str(i) + ".png")
- 
+ 		'''

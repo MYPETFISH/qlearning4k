@@ -130,10 +130,13 @@ class Agent:
 			if game.is_won():
 				win_count += 1
 		print("Accuracy {} %".format(100. * win_count / nb_epoch))
+		
+		'''
 		if visualize:
 			if 'images' not in os.listdir('.'):
 				os.mkdir('images')
 			for i in range(len(frames)):
 				plt.imshow(frames[i], interpolation='none')
 				plt.savefig("images/" + game.name + str(i) + ".png")
+		'''
  

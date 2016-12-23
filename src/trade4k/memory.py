@@ -27,8 +27,33 @@ class ExperienceReplay(Memory):
     def remember(self, s, a, r, s_prime, game_over):
         self.input_shape = s.shape[1:]
         self.memory.append(np.concatenate([s.flatten(), np.array(a).flatten(), np.array(r).flatten(), s_prime.flatten(), 1 * np.array(game_over).flatten()]))
+        
+        # if no reward, do we remember? do we remember unremarkable events?
+        
+        simple_sort=False
+        
         if self.memory_size > 0 and len(self.memory) > self.memory_size:
-            self.memory.pop(0)
+            if (simple_sort):
+                self.memory.pop(0)
+            else:
+                # smarter is to delete the memory with the smallest effect
+                # i.e. smallest square root of reward (high +ve/-ve should stay)
+                # or is this against principles of discounted reward?
+                #  sort memory with lowest reward at end
+                
+                # for flattened: s, a, r, s_prime, game over
+                # index of r is e.g. self.memory[0][-s_prime.size-2]
+                
+                # so for ([input_t, action, reward_t, input_tp1], game_over)  mem[0][2]
+                #self.memory = sorted(self.memory, key=lambda mem: mem[0][2]*mem[0][2], reverse=True)
+
+                r_idx = -s_prime.size-2            
+                #self.memory = sorted(self.memory, key=lambda mem: mem[0][r_idx]*mem[0][r_idx], reverse=True)
+                self.memory.sort(key=lambda mem: mem[r_idx]*mem[r_idx], reverse=True)
+                
+                # remove memory at end: lowest reward
+                self.memory.pop()
+
 
     def get_batch(self, model, batch_size, gamma=0.9):
         if self.fast:
@@ -99,6 +124,7 @@ class ExperienceReplay(Memory):
         Qsa = K.reshape(Qsa, (batch_size, nb_actions))
         delta = K.reshape(self.one_hot(a, nb_actions), (batch_size, nb_actions))
         targets = (1 - delta) * Y[:batch_size] + delta * (r + gamma * (1 - game_over) * Qsa)
+        # error here
         self.batch_function = K.function(inputs=[samples], outputs=[S, targets])
 
     def  one_hot(self, seq, num_classes):

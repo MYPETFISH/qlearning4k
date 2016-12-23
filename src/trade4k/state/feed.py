@@ -8,6 +8,7 @@ from trade4k.state.config import Config
 from sklearn import preprocessing
 import time, os
 import datetime
+import random
 
 class Feed(object):
 
@@ -19,6 +20,7 @@ class Feed(object):
  
     def __init__(self, sessions=2000):  #
 
+        self.sessions = sessions
         s = (6, sessions)                    # does 6 mean 7 columns?!
         self.data = np.empty(s)
         self.data = self.loadData(sessions) # floats
@@ -29,11 +31,13 @@ class Feed(object):
         #self.scaled = # rather convert in realtime?
         self.scaler.fit_transform(self.data[1:,])
 
-        self.start = 750    # to target specific regions    
+        self.start = Config.start_session   # to target specific regions    
         self.reset()
+        
     
     def reset(self):
-        self.t = 1 + self.start
+        self.t = 1 + self.start + random.randint(-Config.start_vary, Config.start_vary)
+        print ('reset t to {}:'.format(self.t))
     
     def incrementTime(self, delta=1):
         self.t = self.t + delta
@@ -104,3 +108,6 @@ class Feed(object):
         dt = datetime.datetime.fromtimestamp(e).strftime('%Y-%m-%d')
         return dt
     
+    def isEod(self, horizon):
+        if (self.t + horizon < self.sessions): return False
+        else: return True
