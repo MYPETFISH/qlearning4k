@@ -18,7 +18,7 @@ from pygments.lexer import using
 
 from trade4k.state.config import Config
 
-envUri = "C:/temp/py/k/3/6/"
+envUri = "C:/temp/py/k/3/"
 envSave = "epochs_12-23"
 
 #config = Config()

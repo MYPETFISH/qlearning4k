@@ -21,7 +21,7 @@ class Config(object):
     batch_size=75
     epoch = 1500
 
-    f_model = 'kmodel_' + str(horizon) +'_'
+    f_model = 'kmodel_' + str(horizon) +'_ltsm'
     
     start_session = 750
     start_vary = 300
@@ -29,7 +29,7 @@ class Config(object):
     floor_coef = .5
     coef_win= 1.15       # beat buy and hold by 15%
     coef_lose = 0.75    # lost 1/4 of wealth compared to buy and hold
-    
+    sort_simple = True
     
     gamma = .95        # Discount factor
     epsilon = .3       # Exploration factor. Can be an integer or a tuple/list of integers with 2 integers. If tuple/list, exploration factor will drop from the first value to the second during traing. 

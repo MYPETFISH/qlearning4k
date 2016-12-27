@@ -2,6 +2,8 @@ import numpy as np
 from random import sample
 from keras import backend as K
 
+from trade4k.state.config import Config
+
 class Memory:
 
     def __init__(self):
@@ -33,7 +35,7 @@ class ExperienceReplay(Memory):
         simple_sort=False
         
         if self.memory_size > 0 and len(self.memory) > self.memory_size:
-            if (simple_sort):
+            if (Config.sort_simple):
                 self.memory.pop(0)
             else:
                 # smarter is to delete the memory with the smallest effect

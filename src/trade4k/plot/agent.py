@@ -11,13 +11,13 @@ from trade4k.state.config import Config
 
 #config = Config()
 
-uri = "C:/temp/py/k/3/"
+uri = "C:/temp/py/k/4/"
 
 #f_fig = '3/fig/train'
 f_fig = 'fig/train'
     
 i=0
-while (i<2):
+while (i<999):
     data = np.loadtxt(open(uri + 'train' + str(i) + '.csv', 'rb'), delimiter=',')
     #data = np.loadtxt(open(Config.save_uri + '_run' + '.csv', 'rb'), delimiter=',')
                      

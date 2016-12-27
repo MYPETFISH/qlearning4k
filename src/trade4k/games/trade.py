@@ -50,7 +50,7 @@ class Trade(Game):
 	def play(self, action):
 		assert action in range(3), "Invalid action."
 		
-		if (self.feed.t%10==0): print self.feed.t,
+		#if (self.feed.t%10==0): print self.feed.t,
 		print str(action),
 		
 		# local copy of state to work with

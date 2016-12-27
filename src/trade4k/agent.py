@@ -17,7 +17,7 @@ from trade4k.util.save import Save
 '''
 class Agent:
 
-	def __init__(self, model, memory=None, memory_size=200, nb_frames=None):
+	def __init__(self, model, memory=None, memory_size=100, nb_frames=None):
 		assert len(model.output_shape) == 2, "Model's output shape should be (nb_samples, nb_actions)."
 		if memory:
 			self.memory = memory
@@ -122,10 +122,11 @@ class Agent:
 				win_count += 1
 			if epsilon > final_epsilon and epoch >= observe:
 				epsilon -= delta
+			print(' ')
 			print("Epoch {:03d}/{:03d} | Loss {:.4f} | Epsilon {:.2f} | Win count {} | loss Avg {:.4f}".format(epoch + 1, nb_epoch, loss, epsilon, win_count, loss/i))
 
 			if ((epoch % 10)==0):
-				save.save_model(model, '4kmodel')
+				save.save_model(model, Config.f_model)
 			save.log_epoch(loss, win_count, loss/i)		
 
 	def play(self, game, nb_epoch=10, epsilon=0., visualize=True):

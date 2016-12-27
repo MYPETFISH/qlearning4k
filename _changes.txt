@@ -1,0 +1,19 @@
+Other varients. Increasing in complexity.
+
+No units, cash, pval. AT ALL. Reward is if prediction is correct
+
+Pval, units, cash but Reward is related to available. So sell and no units? Negative. Buy and no cash? Negative
+
+Need to capture each variation and compare systematically with shorter epochs on smaller data sets
+
+
+Duplicate the forked repository and make private!!
+Cut test data into short sections, try 10 sessions repeated 10 times
+
+Test with one session input, NO port, unit, cash inputs 
+
+To do that, the the parameters* for functions
+
+Then start simple. 10 memories
+
+Look into cross regulating tests. Basicall find right hidden layers, layer size, learning rate first on small sample sizes then scale up

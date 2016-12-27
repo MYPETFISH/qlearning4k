@@ -37,7 +37,7 @@ class Feed(object):
     
     def reset(self):
         self.t = 1 + self.start + random.randint(-Config.start_vary, Config.start_vary)
-        print ('reset t to {}:'.format(self.t))
+        print ('reset t to {} : '.format(self.t)), 
     
     def incrementTime(self, delta=1):
         self.t = self.t + delta

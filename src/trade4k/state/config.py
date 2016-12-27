@@ -5,11 +5,11 @@
 class Config(object):
 
     f_agent = 'agent_stats'
-    f_data = 'test_4_rio_rv_rg.csv'
-    save_uri = "C:/temp/py/k/3/"
-    data_uri = "C:/temp/py/k/test_4_rio_rv_rg.csv"
+    save_uri = "C:/temp/py/k/4/"
 
-    #f_model = '_model_2h_2'
+    # 1-9
+    #data_uri = "C:/temp/py/k/test_4_rio_rv_rg.csv"
+    #horizon=3
 
     funds = 10000
     units = 0
@@ -17,23 +17,46 @@ class Config(object):
     policy_stocks = 1   # 1=100% units sold per order
 
     lr=0.001
-    horizon=2
-    batch_size=75
-    epoch = 1500
 
-    f_model = 'kmodel_' + str(horizon) +'_'
+    #batch_size=100          # sessions in memory
+    #epoch = 2500            # epochs to run
+
+    nb_frames = 1           # for ltsm
     
-    start_session = 750
-    start_vary = 300
+    #sessions = 1000         # number of sessions to train on 
+    #start_session = 750     # starting session
+    #start_vary = 200        # varying by +/- this amount
 
     floor_coef = .5
-    coef_win= 1.15       # beat buy and hold by 15%
-    coef_lose = 0.75    # lost 1/4 of wealth compared to buy and hold
+    coef_win= 1.10          # beat buy and hold by 15%
+    coef_lose = 0.90  # inverse of above
     
-    
+    sort_simple = False
     gamma = .95        # Discount factor
     epsilon = .3       # Exploration factor. Can be an integer or a tuple/list of integers with 2 integers. If tuple/list, exploration factor will drop from the first value to the second during traing. 
     epsilon_rate = .8  # Rate that epsilon should drop. If its 0.4 for example, epsilon will reach the lower value by the time 40 % of the training is complete.
+    
+    
+    # 10+
+    data_uri = "C:/temp/py/k/test_10_rg.csv"
+    horizon = 1
+    sessions = 100         # number of sessions to train on 
+    start_session = 0     # starting session
+    start_vary = 0        # varying by +/- this amount
+    
+    batch_size=2          # sessions in memory
+    memory_size = 6
+
+    epoch = 1000            # epochs to run
+    vals = 3
+    indicators = 7
+    hidden_size = ((horizon * indicators) + vals )/2# - 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
+    in_dim = (horizon * indicators) + vals
+
+    # all
+    f_model = 'kmodel_' + str(horizon) +'_config'
+
     
     def __init__(self, params):
         pass
